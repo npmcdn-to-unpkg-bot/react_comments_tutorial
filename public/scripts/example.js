@@ -11,11 +11,8 @@
  */
 
 // tutorial1-raw.js
-var CommentBox = React.createClass({displayName: 'CommentBox',
-  getInitialState: function() {
-    return {data: []};
-  },
-  componentDidMount: function() {
+var CommentBox = React.createClass({
+  loadCommentsFromServer: function() {
     $.ajax({
       url: this.props.url,
       dataType: 'json',
@@ -27,6 +24,13 @@ var CommentBox = React.createClass({displayName: 'CommentBox',
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
+  },
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentDidMount: function() {
+    this.loadCommentsFromServer();
+    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
   },
   render: function() {
     return (
@@ -91,6 +95,6 @@ var data = [
 ];
 
 ReactDOM.render(
-  <CommentBox url="/api/comments" />,
+  <CommentBox url="/api/comments" pollInterval={2000} />,
   document.getElementById('content')
 );
